@@ -22,6 +22,11 @@ class FlickerSignature {
 
   protected BCR: DOMRect
 
+  poslist: {x: number, y: number}[] = []
+
+  /** 是否正在绘制中 */
+  moveing: boolean = false
+
   constructor (el: HTMLCanvasElement, options: FS.Options) {
 
     if ( !el ) {
@@ -40,6 +45,20 @@ class FlickerSignature {
     
     this.ctx = this.initCanvas()
 
+    this.ctx.beginPath()
+
+    this.ctx.moveTo(50, 50)
+
+    this.ctx.quadraticCurveTo(60, 100, 80, 100)
+
+    this.ctx.stroke()
+
+    this.ctx.moveTo(80, 100)
+
+    this.ctx.quadraticCurveTo(90, 100, 100, 110)
+
+    this.ctx.stroke()
+
     return this
 
   }
@@ -56,8 +75,6 @@ class FlickerSignature {
    
    ctx.strokeStyle = '#000'
 
-   console.log('context:', ctx);
-
    return ctx
 
   }
@@ -70,26 +87,61 @@ class FlickerSignature {
     console.log("this.ctx:", this.ctx);
     
     // 新建路径
-    this.ctx.beginPath()
+    this.ctx.beginPath() 
 
-    this.ctx.moveTo(this.BCR.top - clientY, this.BCR.left - clientX)
+    // this.ctx.moveTo(clientX, clientY)
+
+    this.poslist.push(
+      {
+        x: clientX,
+        y: clientY
+      }
+    )
 
   }
 
   touchmove ( ev: TouchEvent) {
 
-    const { clientX, clientY } = ev.targetTouches[0]
-    console.log('touchmove:', clientY);
+    const { clientX, clientY, pageY, screenY } = ev.targetTouches[0]
 
-    this.ctx.moveTo( clientY,  clientX)
+    console.log('touchmove:', clientY, pageY, screenY );
 
-    this.ctx.lineTo( clientY,  clientX)
+   
+    // 取整数 有利于canvas的优化
+    // this.ctx.lineTo( Math.floor(clientX),  Math.floor(clientY) )
+
+    if ( this.poslist.length === 3 ) {
+      console.log("this.poslist:", this.poslist);
+      
+      const [ startPos, middelPos, endPos ] = this.poslist
+
+      this.ctx.moveTo( startPos.x, startPos.y )
+
+      const s = {
+        x: (endPos.x + middelPos.x) / 2,
+        y: (endPos.y + middelPos.y) / 2
+      }
+      
+      this.ctx.quadraticCurveTo(
+        startPos.x, startPos.y,
+        s.x, s.y
+      )
+
+      this.poslist = []
+
+    } else {
+      this.poslist.push({
+        x: Math.floor(clientX),
+        y: Math.floor(clientY)
+      })
+    }
 
     this.ctx.stroke()
   }
 
   touchend ( ev: TouchEvent) {
- 
+    this.poslist = []
+    this.ctx.closePath()
     console.log('touchend:', ev);
 
   }

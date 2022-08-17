@@ -4,6 +4,12 @@ declare class FlickerSignature {
     protected options: FS.Options;
     protected ctx: CanvasRenderingContext2D;
     protected BCR: DOMRect;
+    poslist: {
+        x: number;
+        y: number;
+    }[];
+    /** 是否正在绘制中 */
+    moveing: boolean;
     constructor(el: HTMLCanvasElement, options: FS.Options);
     initCanvas(): CanvasRenderingContext2D;
     touchstart(ev: TouchEvent): void;
