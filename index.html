@@ -4,8 +4,17 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;"/>
   <title>Document</title>
   <style>
+    *{
+      -webkit-touch-callout:none; /*系统默认菜单被禁用*/
+      -webkit-user-select:none; /*webkit浏览器*/
+      -khtml-user-select:none; /*早期浏览器*/
+      -moz-user-select:none;/*火狐*/
+      -ms-user-select:none; /*IE10*/
+      user-select:none;
+    }
     html body {
       margin: 0;
       padding: 0;
@@ -13,29 +22,53 @@
       height: 100vh;
       overflow: hidden;
       border: none;
+      touch-callout: none;
+      -webkit-touch-callout: none;
     }
   </style>
 </head>
 <body>
 
   <div style="width: 320px;height: 320px;background: pink" >
-    <canvas id="canvas" style="width: 300px;height: 300px" ></canvas>
+    <canvas id="canvas" width="300" height="300" style="background-color: #fff;" ></canvas>
+
+    <button onclick="cancelStrokes()" >cancelStrokes</button>
+    <button onclick="recoverStrokes()" >recoverStrokes</button>
+    <button onclick="a()" >a</button>
   </div>
 
   <!-- <script src="./dist/index" ></script> -->
 
+  
+<script>
+      
+//   function cancelStrokes () {
+//   console.log('22');
+// }
+</script>
 
-   <script type="module"   >
+   <script type="module" >
 
     import FlickerSignature from './dist/index.js'
+   
 
-    console.log("x");
     const fs = new FlickerSignature(
-      document.getElementById('canvas')
+      document.getElementById('canvas'),
+      {
+        lineColor: '#000',
+        backgroundImg: 'grid'
+      }
     )
 
+    const { cancelStrokes, recoverStrokes } = fs
+    console.log(cancelStrokes);
+    window.cancelStrokes = cancelStrokes.bind(fs)
+    window.recoverStrokes = recoverStrokes.bind(fs)
     console.log(fs);
-
+    window.a = function () {
+      fs.toBlob()
+    }
    </script>
+
 </body>
 </html>
