@@ -1,6 +1,6 @@
 {
   "name": "flicker-signature",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "更好用的签名库",
   "main": "dist/index.js",
   "scripts": {
