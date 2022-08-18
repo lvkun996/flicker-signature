@@ -1,25 +1,50 @@
-import { getHandlerKey } from './src/utils/index' 
+import { getHandlerKey, getPlatform } from './utils/index'
+
+// function getPlatform () {
+  
+//   if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(|)|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent) ) {
+//     return 'Mobile'
+//   }
+
+//   else {
+//     return 'Desktop'
+//   }
+
+// }
+
+// export function getHandlerKey () {
+//   const platform = getPlatform()
+//   if (platform === 'Mobile') {
+//     return {
+//       start: 'touchstart',
+//       move: 'touchmove',
+//       end: 'touchend'
+//     }
+//   } else {
+//     return {
+//       start: 'mousedown',
+//       move: 'mousemove',
+//       end: 'mouseup'
+//     }
+//   }
+// }
 
 class FlickerSignature {
 
-  protected el: HTMLCanvasElement
+  private el: HTMLCanvasElement
 
-  protected options: FS.Options = {
+  private options: FS.Options = {
     lineWidth: 3,
     lineColor: '#000',
     backgroundImg: 'board'
   }
 
-  // public hook: Record<'cancelStrokes', Function>
-
   protected ctx!: CanvasRenderingContext2D
 
-  // protected BCR: DOMRect
-
-  protected points: {x: number, y: number}[] = []
+  private points: {x: number, y: number}[] = [] 
 
   /** 绘图记录 */
-  protected drawRecords: ImageData[] = []
+  private drawRecords: ImageData[] = []
 
   /**
    * 
@@ -28,19 +53,10 @@ class FlickerSignature {
    * @description 初始值是0
    * 
    */
-  protected trackIndex: number = 0
-
-  /**
-   * 
-   * @description 指针 步数
-   * 
-   */
-  protected trackStep: number = 1
-
-  poslist: {x: number, y: number}[] = []
+  private trackIndex: number = 0
 
   /** 是否正在绘制中 */
-  moveing: boolean = false
+  private isMoveing: boolean = false
 
   constructor (el: HTMLCanvasElement, options: FS.Options) {
 
@@ -68,46 +84,19 @@ class FlickerSignature {
     
     this.bindHandler(this.el, 'start', this.touchstart.bind(this))
     this.bindHandler(this.el, 'move', this.touchmove.bind(this))
-    this.bindHandler(this.el, 'end', this.touchend.bind(this))
+    this.bindHandler (this.el, 'end', this.touchend.bind(this))
 
-  //  this.el.addEventListener('touchstart', this.touchstart.bind(this))
-  
-   //  this.el.addEventListener('touchmove' , (ev: TouchEvent) => {
-  //   window.requestAnimationFrame(this.touchmove.bind(this, ev))
-  //  })
+   this.el.addEventListener('mousedown', this.touchstart.bind(this))
 
-  //  this.el.addEventListener('touchmove' , this.touchmove.bind(this))
-
-  //  this.el.addEventListener('touchend' , this.touchend.bind(this))
-  //  this.el.addEventListener('mouseleave')
-  
    const ctx = this.el.getContext('2d')!
 
-   if (this.options.backgroundImg === 'grid' ) {
-    
-    this.drawGrid(ctx, 10, 10, 'lightgray', 0.5)
-
-   } else if ( this.options.backgroundImg === 'white' ) {
-    
-   } else {
-    
-    const img = new Image(this.el.clientWidth, this.el.clientHeight)
-    
-    img.src = this.options.backgroundImg!
-    
-    img.style.objectFit = 'cover'
-
-    await new Promise( (resolve) => {
-      img.onload = () => {
-        ctx.drawImage(img, 0, 0, img.width, img.height)
-        resolve(true)
-      }
-    })
-   }
+   await this.setBackgroundImg(ctx)
 
    ctx.lineWidth = this.options.lineWidth
    
    ctx.strokeStyle = this.options.lineColor
+
+   ctx.lineJoin = 'round'
 
    ctx.imageSmoothingEnabled = false
 
@@ -118,8 +107,10 @@ class FlickerSignature {
   }
 
   /**
+   * 
    * @description 绑定事件
    * @param ev 
+   * 
    */
   protected bindHandler (
     node: HTMLCanvasElement, 
@@ -128,29 +119,33 @@ class FlickerSignature {
   ) {
     
     node.addEventListener(getHandlerKey()[eventKey], cb, false)
+
   }
 
-  protected touchstart ( ev: TouchEvent) {
+  protected touchstart <T extends TouchEvent | MouseEvent >( ev: T) {
     
-    console.log('touchstart:', ev);
-    const { clientX, clientY } = ev.targetTouches[0]
-
-    console.log("this.ctx:", this.ctx);
-
-    this.ctx.lineJoin = 'round'
+    const pos = this.getPos(ev)
 
     // 新建路径 
     this.ctx.beginPath()
     this.points.push({
-      x: clientX,
-      y: clientY
+      x: pos.x,
+      y: pos.y
     })
 
+    if (getPlatform() === 'Desktop') {
+      this.isMoveing = true
+    }
   }
 
-  protected touchmove ( ev: TouchEvent) {
+  protected touchmove <T extends TouchEvent | MouseEvent>( ev: T) {
 
-    const { clientX, clientY } = ev.targetTouches[0]
+    if (getPlatform() === 'Desktop' && !this.isMoveing) return
+    
+    const pos = this.getPos(ev)
+
+    console.log("pos:", pos);
+    
 
     if ( this.points.length === 3) {
 
@@ -178,13 +173,13 @@ class FlickerSignature {
 
     } else {
       this.points.push({
-        x: Math.floor(clientX),
-        y: Math.floor(clientY)
+        x: Math.floor(pos.x),
+        y: Math.floor(pos.y)
       })
     }
   }
 
-  protected touchend ( ev: TouchEvent) {
+  protected touchend ( ev: TouchEvent | MouseEvent) {
 
     this.points = []
 
@@ -198,6 +193,10 @@ class FlickerSignature {
     )
     
     this.trackIndex = this.drawRecords.length - 1
+
+    if (getPlatform() === 'Desktop') {
+      this.isMoveing = false
+    }
 
   }
 
@@ -222,6 +221,31 @@ class FlickerSignature {
       const imgData = this.drawRecords[this.trackIndex]
       this.ctx.putImageData(imgData, 0, 0)
     }
+  }
+
+  /**设置背景图片 */
+  async setBackgroundImg (ctx: CanvasRenderingContext2D) {
+    if (this.options.backgroundImg === 'grid' ) {
+    
+      this.drawGrid(ctx, 10, 10, 'lightgray', 0.5)
+  
+     } else if ( this.options.backgroundImg === 'white' ) {
+      
+     } else {
+      
+      const img = new Image(this.el.clientWidth, this.el.clientHeight)
+      
+      img.src = this.options.backgroundImg!
+      
+      img.style.objectFit = 'cover'
+  
+      await new Promise( (resolve) => {
+        img.onload = () => {
+          ctx.drawImage(img, 0, 0, img.width, img.height)
+          resolve(true)
+        }
+      })
+     }
   }
 
   toBase64 (type?: string | undefined, quality?: any ) {
@@ -258,7 +282,25 @@ class FlickerSignature {
     // 清除路径
     ctx.closePath();
   }
-  
+
+  getPos (ev: TouchEvent | MouseEvent) {
+    let pos: { x: number, y: number } = Object.create(null)
+
+    if ( getPlatform() === 'Mobile') {
+      const _ev: TouchEvent = ev as TouchEvent
+      const { clientX, clientY } = _ev.targetTouches[0] 
+      pos.x = Math.floor(clientX)
+      pos.y = Math.floor(clientY)
+    } else {
+      const _ev: MouseEvent = ev as MouseEvent
+      const { x, y } = _ev
+      pos.x = Math.floor(x)
+      pos.y = Math.floor(y)
+    }
+
+    return pos
+  }
+
   // drawGrid(10, 10, 'lightgray', 0.5);
 
 }

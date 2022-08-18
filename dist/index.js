@@ -7,7 +7,31 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { getHandlerKey } from './src/utils/index';
+import { getHandlerKey, getPlatform } from './utils/index';
+// function getPlatform () {
+//   if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(|)|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent) ) {
+//     return 'Mobile'
+//   }
+//   else {
+//     return 'Desktop'
+//   }
+// }
+// export function getHandlerKey () {
+//   const platform = getPlatform()
+//   if (platform === 'Mobile') {
+//     return {
+//       start: 'touchstart',
+//       move: 'touchmove',
+//       end: 'touchend'
+//     }
+//   } else {
+//     return {
+//       start: 'mousedown',
+//       move: 'mousemove',
+//       end: 'mouseup'
+//     }
+//   }
+// }
 class FlickerSignature {
     constructor(el, options) {
         this.options = {
@@ -15,7 +39,6 @@ class FlickerSignature {
             lineColor: '#000',
             backgroundImg: 'board'
         };
-        // protected BCR: DOMRect
         this.points = [];
         /** 绘图记录 */
         this.drawRecords = [];
@@ -27,15 +50,8 @@ class FlickerSignature {
          *
          */
         this.trackIndex = 0;
-        /**
-         *
-         * @description 指针 步数
-         *
-         */
-        this.trackStep = 1;
-        this.poslist = [];
         /** 是否正在绘制中 */
-        this.moveing = false;
+        this.isMoveing = false;
         if (!el) {
             throw new Error("canvas node cannot be empty");
         }
@@ -49,58 +65,43 @@ class FlickerSignature {
             this.bindHandler(this.el, 'start', this.touchstart.bind(this));
             this.bindHandler(this.el, 'move', this.touchmove.bind(this));
             this.bindHandler(this.el, 'end', this.touchend.bind(this));
-            //  this.el.addEventListener('touchstart', this.touchstart.bind(this))
-            //  this.el.addEventListener('touchmove' , (ev: TouchEvent) => {
-            //   window.requestAnimationFrame(this.touchmove.bind(this, ev))
-            //  })
-            //  this.el.addEventListener('touchmove' , this.touchmove.bind(this))
-            //  this.el.addEventListener('touchend' , this.touchend.bind(this))
-            //  this.el.addEventListener('mouseleave')
+            this.el.addEventListener('mousedown', this.touchstart.bind(this));
             const ctx = this.el.getContext('2d');
-            if (this.options.backgroundImg === 'grid') {
-                this.drawGrid(ctx, 10, 10, 'lightgray', 0.5);
-            }
-            else if (this.options.backgroundImg === 'white') {
-            }
-            else {
-                const img = new Image(this.el.clientWidth, this.el.clientHeight);
-                img.src = this.options.backgroundImg;
-                img.style.objectFit = 'cover';
-                yield new Promise((resolve) => {
-                    img.onload = () => {
-                        ctx.drawImage(img, 0, 0, img.width, img.height);
-                        resolve(true);
-                    };
-                });
-            }
+            yield this.setBackgroundImg(ctx);
             ctx.lineWidth = this.options.lineWidth;
             ctx.strokeStyle = this.options.lineColor;
+            ctx.lineJoin = 'round';
             ctx.imageSmoothingEnabled = false;
             this.drawRecords.push(ctx.getImageData(0, 0, this.el.clientWidth, this.el.clientHeight));
             return ctx;
         });
     }
     /**
+     *
      * @description 绑定事件
      * @param ev
+     *
      */
     bindHandler(node, eventKey, cb) {
         node.addEventListener(getHandlerKey()[eventKey], cb, false);
     }
     touchstart(ev) {
-        console.log('touchstart:', ev);
-        const { clientX, clientY } = ev.targetTouches[0];
-        console.log("this.ctx:", this.ctx);
-        this.ctx.lineJoin = 'round';
+        const pos = this.getPos(ev);
         // 新建路径 
         this.ctx.beginPath();
         this.points.push({
-            x: clientX,
-            y: clientY
+            x: pos.x,
+            y: pos.y
         });
+        if (getPlatform() === 'Desktop') {
+            this.isMoveing = true;
+        }
     }
     touchmove(ev) {
-        const { clientX, clientY } = ev.targetTouches[0];
+        if (getPlatform() === 'Desktop' && !this.isMoveing)
+            return;
+        const pos = this.getPos(ev);
+        console.log("pos:", pos);
         if (this.points.length === 3) {
             const [startPos, middlePos, endPos] = this.points;
             this.ctx.beginPath();
@@ -116,8 +117,8 @@ class FlickerSignature {
         }
         else {
             this.points.push({
-                x: Math.floor(clientX),
-                y: Math.floor(clientY)
+                x: Math.floor(pos.x),
+                y: Math.floor(pos.y)
             });
         }
     }
@@ -129,6 +130,9 @@ class FlickerSignature {
         }
         this.drawRecords.push(this.ctx.getImageData(0, 0, this.el.clientWidth, this.el.clientHeight));
         this.trackIndex = this.drawRecords.length - 1;
+        if (getPlatform() === 'Desktop') {
+            this.isMoveing = false;
+        }
     }
     /** 撤销绘画 */
     cancelStrokes(count = 1) {
@@ -146,6 +150,27 @@ class FlickerSignature {
             const imgData = this.drawRecords[this.trackIndex];
             this.ctx.putImageData(imgData, 0, 0);
         }
+    }
+    /**设置背景图片 */
+    setBackgroundImg(ctx) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.options.backgroundImg === 'grid') {
+                this.drawGrid(ctx, 10, 10, 'lightgray', 0.5);
+            }
+            else if (this.options.backgroundImg === 'white') {
+            }
+            else {
+                const img = new Image(this.el.clientWidth, this.el.clientHeight);
+                img.src = this.options.backgroundImg;
+                img.style.objectFit = 'cover';
+                yield new Promise((resolve) => {
+                    img.onload = () => {
+                        ctx.drawImage(img, 0, 0, img.width, img.height);
+                        resolve(true);
+                    };
+                });
+            }
+        });
     }
     toBase64(type, quality) {
         return this.el.toDataURL(type, quality);
@@ -177,6 +202,22 @@ class FlickerSignature {
         ctx.stroke();
         // 清除路径
         ctx.closePath();
+    }
+    getPos(ev) {
+        let pos = Object.create(null);
+        if (getPlatform() === 'Mobile') {
+            const _ev = ev;
+            const { clientX, clientY } = _ev.targetTouches[0];
+            pos.x = Math.floor(clientX);
+            pos.y = Math.floor(clientY);
+        }
+        else {
+            const _ev = ev;
+            const { x, y } = _ev;
+            pos.x = Math.floor(x);
+            pos.y = Math.floor(y);
+        }
+        return pos;
     }
 }
 export default FlickerSignature;
