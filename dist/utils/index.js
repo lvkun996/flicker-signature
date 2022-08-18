@@ -27,8 +27,8 @@ export function getHandlerKey() {
     else {
         return {
             start: 'mousedown',
-            move: 'mouseover',
-            end: 'mouseleave'
+            move: 'mousemove',
+            end: 'mouseup'
         };
     }
 }

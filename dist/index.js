@@ -98,6 +98,7 @@ class FlickerSignature {
         }
     }
     touchmove(ev) {
+        console.log('touchmove:', getPlatform(), this.isMoveing);
         if (getPlatform() === 'Desktop' && !this.isMoveing)
             return;
         const pos = this.getPos(ev);
