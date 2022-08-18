@@ -139,15 +139,10 @@ class FlickerSignature {
   }
 
   protected touchmove <T extends TouchEvent | MouseEvent>( ev: T) {
-
-    console.log('touchmove:', getPlatform(), this.isMoveing);
     
-
     if (getPlatform() === 'Desktop' && !this.isMoveing) return
     
     const pos = this.getPos(ev)
-
-    console.log("pos:", pos);
     
     if ( this.points.length === 3) {
 
