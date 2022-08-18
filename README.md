@@ -7,6 +7,10 @@
 npm i flicker-signature
 ```
 
+## 例子
+
+![](./assets/exaple.jpg)
+
 ## 使用
 
 基于原生js，适用任何js场景
@@ -107,4 +111,4 @@ flicker-signature的第一个参数是你的canvas节点
 
 若对您提供了帮助，请作者喝杯咖啡吧~
 
-![](C:\Users\LvKun\Desktop\flicker signature\assets\wecaht.jpg)![](C:\Users\LvKun\Desktop\flicker signature\assets\zhifubao.jpg)
+![](./assets/wecaht.jpg)![](./assets/zhifubao.jpg)
