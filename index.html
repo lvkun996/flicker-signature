@@ -29,17 +29,21 @@
 </head>
 <body>
 
-  <div style="width: 320px;height: 320px;background: pink" >
-    <canvas id="canvas" width="300" height="300" style="background-color: #fff;" ></canvas>
 
-    <button onclick="cancelStrokes()" >cancelStrokes</button>
-    <button onclick="recoverStrokes()" >recoverStrokes</button>
-    <button onclick="a()" >a</button>
+  <div id="app" >
+    {{hello}}
+    <div style="width: 320px;height: 320px;background: pink" >
+      <canvas id="canvas" width="300" height="300" style="background-color: #fff;" ></canvas>
+  
+      <button onclick="cancelStrokes()" >cancelStrokes</button>
+      <button onclick="recoverStrokes()" >recoverStrokes</button>
+      <button onclick="a()" >a</button>
+    </div>
   </div>
+  
 
   <!-- <script src="./dist/index" ></script> -->
-
-  
+  </script>
 <script>
       
 //   function cancelStrokes () {
@@ -48,26 +52,32 @@
 </script>
 
    <script type="module" >
-
+    import Vue from 'https://cdn.jsdelivr.net/npm/vue@2.7.9/dist/vue.esm.browser.js'
     import FlickerSignature from './dist/index.js'
-   
-
-    const fs = new FlickerSignature(
-      document.getElementById('canvas'),
-      {
-        lineColor: '#000',
-        backgroundImg: 'grid'
+    
+    const app = new Vue({
+      el: '#app',
+      data: {
+        hello: 'world'
       }
-    )
+    })
 
-    const { cancelStrokes, recoverStrokes } = fs
-    console.log(cancelStrokes);
-    window.cancelStrokes = cancelStrokes.bind(fs)
-    window.recoverStrokes = recoverStrokes.bind(fs)
-    console.log(fs);
-    window.a = function () {
-      fs.toBlob()
-    }
+    // const fs = new FlickerSignature(
+    //   document.getElementById('canvas'),
+    //   {
+    //     lineColor: '#000',
+    //     backgroundImg: 'grid'
+    //   }
+    // )
+
+    // const { cancelStrokes, recoverStrokes } = fs
+    // console.log(cancelStrokes);
+    // window.cancelStrokes = cancelStrokes.bind(fs)
+    // window.recoverStrokes = recoverStrokes.bind(fs)
+    // console.log(fs);
+    // window.a = function () {
+    //   fs.toBlob()
+    // }
    </script>
 
 </body>

@@ -10,11 +10,7 @@ class FlickerSignature {
     backgroundImg: 'board'
   }
 
-  // public hook: Record<'cancelStrokes', Function>
-
   protected ctx!: CanvasRenderingContext2D
-
-  // protected BCR: DOMRect
 
   protected points: {x: number, y: number}[] = []
 
@@ -236,6 +232,13 @@ class FlickerSignature {
     })
   }
 
+  /**
+   * @description 清除画布上的所有内容
+   */
+  clearCanvas () {
+    this.ctx.clearRect(0, 0 , this.el.width, this.el.height)
+  }
+
   drawGrid (ctx, stepX, stepY, color, lineWidth) {
     ctx.beginPath()
     // 创建垂直格网线路径
@@ -258,8 +261,6 @@ class FlickerSignature {
     // 清除路径
     ctx.closePath();
   }
-  
-  // drawGrid(10, 10, 'lightgray', 0.5);
 
 }
 
