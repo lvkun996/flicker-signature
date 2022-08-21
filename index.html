@@ -62,22 +62,22 @@
       }
     })
 
-    // const fs = new FlickerSignature(
-    //   document.getElementById('canvas'),
-    //   {
-    //     lineColor: '#000',
-    //     backgroundImg: 'grid'
-    //   }
-    // )
+    const fs = new FlickerSignature(
+      document.getElementById('canvas'),
+      {
+        lineColor: '#000',
+        backgroundImg: 'grid'
+      }
+    )
 
-    // const { cancelStrokes, recoverStrokes } = fs
-    // console.log(cancelStrokes);
-    // window.cancelStrokes = cancelStrokes.bind(fs)
-    // window.recoverStrokes = recoverStrokes.bind(fs)
-    // console.log(fs);
-    // window.a = function () {
-    //   fs.toBlob()
-    // }
+    const { cancelStrokes, recoverStrokes } = fs
+    console.log(cancelStrokes);
+    window.cancelStrokes = cancelStrokes.bind(fs)
+    window.recoverStrokes = recoverStrokes.bind(fs)
+    console.log(fs);
+    window.a = function () {
+      fs.toBlob()
+    }
    </script>
 
 </body>
