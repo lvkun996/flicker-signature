@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 import { getHandlerKey, getPlatform } from './utils/index'
 
@@ -6,6 +7,48 @@ class FlickerSignature implements FS.IFlickerSignature {
   protected el: HTMLCanvasElement
 
   protected options: FS.Options = {
+=======
+<<<<<<< HEAD:src/index.ts
+import { getHandlerKey } from './utils/index' 
+=======
+import { getHandlerKey, getPlatform } from './utils/index'
+
+// function getPlatform () {
+  
+//   if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(|)|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent) ) {
+//     return 'Mobile'
+//   }
+
+//   else {
+//     return 'Desktop'
+//   }
+
+// }
+
+// export function getHandlerKey () {
+//   const platform = getPlatform()
+//   if (platform === 'Mobile') {
+//     return {
+//       start: 'touchstart',
+//       move: 'touchmove',
+//       end: 'touchend'
+//     }
+//   } else {
+//     return {
+//       start: 'mousedown',
+//       move: 'mousemove',
+//       end: 'mouseup'
+//     }
+//   }
+// }
+>>>>>>> 508c0bf64329542a2c327fac7d67cdb0c8eef5e3:index.ts
+
+class FlickerSignature {
+
+  private el: HTMLCanvasElement
+
+  private options: FS.Options = {
+>>>>>>> 068937620223816a5182f4425d15f7d39358903a
     lineWidth: 3,
     lineColor: '#000',
     backgroundImg: 'board'
@@ -13,7 +56,15 @@ class FlickerSignature implements FS.IFlickerSignature {
 
   protected ctx!: CanvasRenderingContext2D
 
+<<<<<<< HEAD
   protected points: {x: number, y: number}[] = [] 
+=======
+<<<<<<< HEAD:src/index.ts
+  protected points: {x: number, y: number}[] = []
+=======
+  private points: {x: number, y: number}[] = [] 
+>>>>>>> 508c0bf64329542a2c327fac7d67cdb0c8eef5e3:index.ts
+>>>>>>> 068937620223816a5182f4425d15f7d39358903a
 
   /** 绘图记录 */
   protected drawRecords: ImageData[] = []
@@ -69,8 +120,18 @@ class FlickerSignature implements FS.IFlickerSignature {
     
     this.bindHandler(this.el, 'start', this.touchstart.bind(this))
     this.bindHandler(this.el, 'move', this.touchmove.bind(this))
+<<<<<<< HEAD:src/index.ts
+    this.bindHandler(this.el, 'end', this.touchend.bind(this))
+  
+=======
     this.bindHandler (this.el, 'end', this.touchend.bind(this))
 
+<<<<<<< HEAD
+=======
+   this.el.addEventListener('mousedown', this.touchstart.bind(this))
+
+>>>>>>> 508c0bf64329542a2c327fac7d67cdb0c8eef5e3:index.ts
+>>>>>>> 068937620223816a5182f4425d15f7d39358903a
    const ctx = this.el.getContext('2d')!
 
    console.log("this.el:", this.el);
@@ -255,6 +316,13 @@ class FlickerSignature implements FS.IFlickerSignature {
     })
   }
 
+  /**
+   * @description 清除画布上的所有内容
+   */
+  clearCanvas () {
+    this.ctx.clearRect(0, 0 , this.el.width, this.el.height)
+  }
+
   drawGrid (ctx, stepX, stepY, color, lineWidth) {
     ctx.beginPath()
     // 创建垂直格网线路径
@@ -277,6 +345,8 @@ class FlickerSignature implements FS.IFlickerSignature {
     // 清除路径
     ctx.closePath();
   }
+<<<<<<< HEAD:src/index.ts
+=======
 
   getPos (ev: TouchEvent | MouseEvent) {
     let pos: { x: number, y: number } = Object.create(null)
@@ -296,6 +366,12 @@ class FlickerSignature implements FS.IFlickerSignature {
     return pos
   }
 
+<<<<<<< HEAD
+=======
+  // drawGrid(10, 10, 'lightgray', 0.5);
+>>>>>>> 508c0bf64329542a2c327fac7d67cdb0c8eef5e3:index.ts
+
+>>>>>>> 068937620223816a5182f4425d15f7d39358903a
 }
 
 export default FlickerSignature

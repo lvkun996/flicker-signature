@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 068937620223816a5182f4425d15f7d39358903a
 /******************************************************************************
 Copyright (c) Microsoft Corporation.
 
@@ -52,12 +56,56 @@ function getHandlerKey() {
     else {
         return {
             start: 'mousedown',
+<<<<<<< HEAD
             move: 'mousemove',
             end: 'mouseup'
+=======
+            move: 'mouseover',
+            end: 'mouseleave'
+>>>>>>> 068937620223816a5182f4425d15f7d39358903a
         };
     }
 }
 
+<<<<<<< HEAD
+=======
+=======
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+import { getHandlerKey, getPlatform } from './utils/index';
+// function getPlatform () {
+//   if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(|)|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent) ) {
+//     return 'Mobile'
+//   }
+//   else {
+//     return 'Desktop'
+//   }
+// }
+// export function getHandlerKey () {
+//   const platform = getPlatform()
+//   if (platform === 'Mobile') {
+//     return {
+//       start: 'touchstart',
+//       move: 'touchmove',
+//       end: 'touchend'
+//     }
+//   } else {
+//     return {
+//       start: 'mousedown',
+//       move: 'mousemove',
+//       end: 'mouseup'
+//     }
+//   }
+// }
+>>>>>>> 508c0bf64329542a2c327fac7d67cdb0c8eef5e3
+>>>>>>> 068937620223816a5182f4425d15f7d39358903a
 class FlickerSignature {
     constructor({ el, options }) {
         this.options = {
@@ -95,10 +143,36 @@ class FlickerSignature {
             this.bindHandler(this.el, 'start', this.touchstart.bind(this));
             this.bindHandler(this.el, 'move', this.touchmove.bind(this));
             this.bindHandler(this.el, 'end', this.touchend.bind(this));
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+            const ctx = this.el.getContext('2d');
+            if (this.options.backgroundImg === 'grid') {
+                this.drawGrid(ctx, 10, 10, 'lightgray', 0.5);
+            }
+            else if (this.options.backgroundImg === 'white') ;
+            else {
+                const img = new Image(this.el.clientWidth, this.el.clientHeight);
+                img.src = this.options.backgroundImg;
+                img.style.objectFit = 'cover';
+                yield new Promise((resolve) => {
+                    img.onload = () => {
+                        ctx.drawImage(img, 0, 0, img.width, img.height);
+                        resolve(true);
+                    };
+                });
+            }
+=======
+            this.el.addEventListener('mousedown', this.touchstart.bind(this));
+>>>>>>> 068937620223816a5182f4425d15f7d39358903a
             const ctx = this.el.getContext('2d');
             console.log("this.el:", this.el);
             yield this.setBackgroundImg(ctx);
+<<<<<<< HEAD
             console.log();
+=======
+>>>>>>> 508c0bf64329542a2c327fac7d67cdb0c8eef5e3
+>>>>>>> 068937620223816a5182f4425d15f7d39358903a
             ctx.lineWidth = this.options.lineWidth;
             ctx.strokeStyle = this.options.lineColor;
             ctx.lineJoin = 'round';
@@ -216,6 +290,12 @@ class FlickerSignature {
                 resolve(blob);
             }, type, quality);
         });
+    }
+    /**
+     * @description 清除画布上的所有内容
+     */
+    clearCanvas() {
+        this.ctx.clearRect(0, 0, this.el.width, this.el.height);
     }
     drawGrid(ctx, stepX, stepY, color, lineWidth) {
         ctx.beginPath();
