@@ -1,39 +1,11 @@
+
 import { getHandlerKey, getPlatform } from './utils/index'
 
-// function getPlatform () {
-  
-//   if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(|)|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent) ) {
-//     return 'Mobile'
-//   }
+class FlickerSignature implements FS.IFlickerSignature {
 
-//   else {
-//     return 'Desktop'
-//   }
+  protected el: HTMLCanvasElement
 
-// }
-
-// export function getHandlerKey () {
-//   const platform = getPlatform()
-//   if (platform === 'Mobile') {
-//     return {
-//       start: 'touchstart',
-//       move: 'touchmove',
-//       end: 'touchend'
-//     }
-//   } else {
-//     return {
-//       start: 'mousedown',
-//       move: 'mousemove',
-//       end: 'mouseup'
-//     }
-//   }
-// }
-
-class FlickerSignature {
-
-  private el: HTMLCanvasElement
-
-  private options: FS.Options = {
+  protected options: FS.Options = {
     lineWidth: 3,
     lineColor: '#000',
     backgroundImg: 'board'
@@ -41,10 +13,10 @@ class FlickerSignature {
 
   protected ctx!: CanvasRenderingContext2D
 
-  private points: {x: number, y: number}[] = [] 
+  protected points: {x: number, y: number}[] = [] 
 
   /** 绘图记录 */
-  private drawRecords: ImageData[] = []
+  protected drawRecords: ImageData[] = []
 
   /**
    * 
@@ -53,20 +25,33 @@ class FlickerSignature {
    * @description 初始值是0
    * 
    */
-  private trackIndex: number = 0
+  protected trackIndex: number = 0
+
+  protected BCR: DOMRect
 
   /** 是否正在绘制中 */
-  private isMoveing: boolean = false
+  protected isMoveing: boolean = false
 
-  constructor (el: HTMLCanvasElement, options: FS.Options) {
+  constructor ({
+    el,
+    options
+  }: {
+    el?: HTMLCanvasElement, 
+    options?: FS.Options
+  }) {
 
     if ( !el ) {
-
       throw new Error("canvas node cannot be empty");
-    
+    }
+
+    if ( !options ) {
+      console.warn("options not configured");
     }
 
     this.el = el
+
+    console.log("options:", options);
+    
 
     this.options = Object.assign(
       {},
@@ -86,12 +71,13 @@ class FlickerSignature {
     this.bindHandler(this.el, 'move', this.touchmove.bind(this))
     this.bindHandler (this.el, 'end', this.touchend.bind(this))
 
-   this.el.addEventListener('mousedown', this.touchstart.bind(this))
-
    const ctx = this.el.getContext('2d')!
 
+   console.log("this.el:", this.el);
+   
    await this.setBackgroundImg(ctx)
-
+    console.log();
+    
    ctx.lineWidth = this.options.lineWidth
    
    ctx.strokeStyle = this.options.lineColor
@@ -113,7 +99,7 @@ class FlickerSignature {
    * 
    */
   protected bindHandler (
-    node: HTMLCanvasElement, 
+    node: HTMLCanvasElement,
     eventKey: 'start' | 'move' | 'end' , 
     cb
   ) {
@@ -198,7 +184,7 @@ class FlickerSignature {
   }
 
   /** 撤销绘画 */
-  public cancelStrokes  (count: number | string = 1)  {
+  cancelStrokes  (count: number | string = 1)  {
 
     if (this.drawRecords.length && this.trackIndex >= 1) {
 
@@ -220,8 +206,20 @@ class FlickerSignature {
     }
   }
 
+  clearCanvas () {
+
+    this.drawRecords = this.drawRecords.splice(0, 1)
+
+    this.ctx.putImageData(this.drawRecords[0], 0, 0)
+    
+    this.trackIndex = 0
+
+  }
+
   /**设置背景图片 */
   async setBackgroundImg (ctx: CanvasRenderingContext2D) {
+    console.log(this.options);
+    
     if (this.options.backgroundImg === 'grid' ) {
     
       this.drawGrid(ctx, 10, 10, 'lightgray', 0.5)
@@ -297,8 +295,6 @@ class FlickerSignature {
 
     return pos
   }
-
-  // drawGrid(10, 10, 'lightgray', 0.5);
 
 }
 

@@ -34,39 +34,36 @@
 
     <button onclick="cancelStrokes()" >cancelStrokes</button>
     <button onclick="recoverStrokes()" >recoverStrokes</button>
+    <button onclick="clearCanvas()" >clearCanvas</button>
     <button onclick="a()" >a</button>
+
   </div>
-
-  <!-- <script src="./dist/index" ></script> -->
-
-  
-<script>
-      
-//   function cancelStrokes () {
-//   console.log('22');
-// }
-</script>
+    
 
    <script type="module" >
 
     import FlickerSignature from './dist/index.js'
 
     const fs = new FlickerSignature(
-      document.getElementById('canvas'),
       {
-        lineColor: '#000',
-        backgroundImg: 'grid'
+        el: document.getElementById('canvas'),
+        options: {
+          lineColor: '#000',
+          backgroundImg: 'grid'
+        }
       }
     )
 
-    const { cancelStrokes, recoverStrokes } = fs
+    const { cancelStrokes, recoverStrokes, clearCanvas } = fs
     console.log(cancelStrokes);
     window.cancelStrokes = cancelStrokes.bind(fs)
     window.recoverStrokes = recoverStrokes.bind(fs)
+    window.clearCanvas = clearCanvas.bind(fs)
     console.log(fs);
     window.a = function () {
       fs.toBlob()
     }
+
    </script>
 
 </body>

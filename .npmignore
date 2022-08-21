@@ -1,2 +1,4 @@
 ./src
 ./git
+./node_modules
+./index.html
