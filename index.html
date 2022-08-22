@@ -29,19 +29,26 @@
 </head>
 <body>
 
-  <div style="width: 320px;height: 320px;background: pink" >
-    <canvas id="canvas" width="300" height="300" style="background-color: #fff;" ></canvas>
+  <!-- <div style="width: 320px;height: 320px;background: pink" > -->
+    <canvas id="canvas"  style="background-color: pink;" ></canvas>
 
     <button onclick="cancelStrokes()" >cancelStrokes</button>
     <button onclick="recoverStrokes()" >recoverStrokes</button>
     <button onclick="a()" >a</button>
-  </div>
+  <!-- </div> -->
 
   <!-- <script src="./dist/index" ></script> -->
 
   
 <script>
-      
+
+    const canvas =  document.getElementById('canvas')
+    window.onresize = (ev) => {
+
+      canvas.width = ev.currentTarget.innerWidth / 2
+      canvas.height = ev.currentTarget.innerHeight / 2
+
+    }
 //   function cancelStrokes () {
 //   console.log('22');
 // }
@@ -50,6 +57,13 @@
    <script type="module" >
 
     import FlickerSignature from './dist/index.js'
+
+    // window.sc
+
+    window.onresize = (en) => {
+      console.log(en);
+    }
+
 
     const fs = new FlickerSignature(
       document.getElementById('canvas'),

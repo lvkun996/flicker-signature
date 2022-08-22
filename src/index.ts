@@ -1,34 +1,5 @@
 import { getHandlerKey, getPlatform } from './utils/index'
 
-// function getPlatform () {
-  
-//   if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(|)|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent) ) {
-//     return 'Mobile'
-//   }
-
-//   else {
-//     return 'Desktop'
-//   }
-
-// }
-
-// export function getHandlerKey () {
-//   const platform = getPlatform()
-//   if (platform === 'Mobile') {
-//     return {
-//       start: 'touchstart',
-//       move: 'touchmove',
-//       end: 'touchend'
-//     }
-//   } else {
-//     return {
-//       start: 'mousedown',
-//       move: 'mousemove',
-//       end: 'mouseup'
-//     }
-//   }
-// }
-
 class FlickerSignature {
 
   private el: HTMLCanvasElement
@@ -143,7 +114,7 @@ class FlickerSignature {
     if (getPlatform() === 'Desktop' && !this.isMoveing) return
     
     const pos = this.getPos(ev)
-    
+
     if ( this.points.length === 3) {
 
       const [ startPos, middlePos, endPos ] = this.points
@@ -198,7 +169,7 @@ class FlickerSignature {
   }
 
   /** 撤销绘画 */
-  public cancelStrokes  (count: number | string = 1)  {
+  cancelStrokes  (count: number | string = 1)  {
 
     if (this.drawRecords.length && this.trackIndex >= 1) {
 
@@ -218,6 +189,11 @@ class FlickerSignature {
       const imgData = this.drawRecords[this.trackIndex]
       this.ctx.putImageData(imgData, 0, 0)
     }
+  }
+
+  /**清除画布 */
+  clearStrokes () {
+     
   }
 
   /**设置背景图片 */
