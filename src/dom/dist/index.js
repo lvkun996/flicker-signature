@@ -1,24 +1,22 @@
-/**
- *
- * @description 获取dom节点
- *
- */
-function getDom() {
-}
+"use strict";
 /**
  *
  * @description 创建canvas节点
  *
  */
-export function createEmpteNode() {
+exports.__esModule = true;
+exports.getBCR = exports.createEmpteNode = void 0;
+function createEmpteNode() {
     return document.createElement('canvas');
 }
+exports.createEmpteNode = createEmpteNode;
 /**
  * @description 获取元素的大小及其相对于视口的位置
  * @param node
  * @returns
  *
  */
-export function getBCR(node) {
+function getBCR(node) {
     return node.getBoundingClientRect();
 }
+exports.getBCR = getBCR;

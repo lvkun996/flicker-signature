@@ -5,7 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
-  <title>Document</title>
+  <title>example</title>
   <style>
     *{
       -webkit-touch-callout:none; /*系统默认菜单被禁用*/
@@ -29,58 +29,40 @@
 </head>
 <body>
 
-  <!-- <div style="width: 320px;height: 320px;background: pink" > -->
-    <canvas id="canvas"  style="background-color: pink;" ></canvas>
 
-    <button onclick="cancelStrokes()" >cancelStrokes</button>
-    <button onclick="recoverStrokes()" >recoverStrokes</button>
-    <button onclick="a()" >a</button>
-  <!-- </div> -->
+  <div id="app" >
 
-  <!-- <script src="./dist/index" ></script> -->
-
+    <div style="width: 320px;height: 320px;background: pink" >
+      <canvas id="canvas" width="300" height="300" style="background-color: #fff;" ></canvas>
   
-<script>
+      <button onclick="cancelStrokes()" >cancelStrokes</button>
+      <button onclick="recoverStrokes()" >recoverStrokes</button>
+      <button onclick="a()" >a</button>
 
-    const canvas =  document.getElementById('canvas')
-    window.onresize = (ev) => {
-
-      canvas.width = ev.currentTarget.innerWidth / 2
-      canvas.height = ev.currentTarget.innerHeight / 2
-
-    }
-//   function cancelStrokes () {
-//   console.log('22');
-// }
-</script>
+    </div>
+  </div>
+  
 
    <script type="module" >
-
+  
     import FlickerSignature from './dist/index.js'
 
-    // window.sc
-
-    window.onresize = (en) => {
-      console.log(en);
-    }
-
-
     const fs = new FlickerSignature(
-      document.getElementById('canvas'),
       {
-        lineColor: '#000',
-        backgroundImg: 'grid'
+        el: document.getElementById('canvas'),
       }
     )
 
-    const { cancelStrokes, recoverStrokes } = fs
+    const { cancelStrokes, recoverStrokes, clearCanvas } = fs
     console.log(cancelStrokes);
     window.cancelStrokes = cancelStrokes.bind(fs)
     window.recoverStrokes = recoverStrokes.bind(fs)
+    window.clearCanvas = clearCanvas.bind(fs)
     console.log(fs);
     window.a = function () {
       fs.toBlob()
     }
+
    </script>
 
 </body>

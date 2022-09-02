@@ -2,17 +2,6 @@
 
 /**
  * 
- * @description 获取dom节点
- * 
- */
-
-function getDom () {
-
-}
-
-
-/**
- * 
  * @description 创建canvas节点
  * 
  */

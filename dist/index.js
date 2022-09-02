@@ -1,4 +1,19 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+/******************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+
+function __awaiter(thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -6,38 +21,51 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
-};
-import { getHandlerKey, getPlatform } from './utils/index';
-// function getPlatform () {
-//   if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(|)|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent) ) {
-//     return 'Mobile'
-//   }
-//   else {
-//     return 'Desktop'
-//   }
-// }
-// export function getHandlerKey () {
-//   const platform = getPlatform()
-//   if (platform === 'Mobile') {
-//     return {
-//       start: 'touchstart',
-//       move: 'touchmove',
-//       end: 'touchend'
-//     }
-//   } else {
-//     return {
-//       start: 'mousedown',
-//       move: 'mousemove',
-//       end: 'mouseup'
-//     }
-//   }
-// }
+}
+
+/**
+ *
+ * @description 判断用户设备是桌面端还是移动端
+ * @returns Mobile | Desktop
+ *
+ */
+function getPlatform() {
+    if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(|)|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent)) {
+        return 'Mobile';
+    }
+    else {
+        return 'Desktop';
+    }
+}
+/**
+ *
+ * @description 获取不同平台对应的事件
+ *
+ */
+function getHandlerKey() {
+    const platform = getPlatform();
+    if (platform === 'Mobile') {
+        return {
+            start: 'touchstart',
+            move: 'touchmove',
+            end: 'touchend'
+        };
+    }
+    else {
+        return {
+            start: 'mousedown',
+            move: 'mousemove',
+            end: 'mouseup'
+        };
+    }
+}
+
 class FlickerSignature {
-    constructor(el, options) {
+    constructor({ el, options }) {
         this.options = {
             lineWidth: 3,
             lineColor: '#000',
-            backgroundImg: 'board'
+            backgroundImg: 'grid'
         };
         this.points = [];
         /** 绘图记录 */
@@ -55,17 +83,24 @@ class FlickerSignature {
         if (!el) {
             throw new Error("canvas node cannot be empty");
         }
+        if (!options) {
+            console.warn("Flicker-signture: options not configured");
+        }
         this.el = el;
         this.options = Object.assign({}, this.options, options);
         this.initCanvas().then(_ => this.ctx = _);
         return this;
+    }
+    /**暴露给用户 */
+    get IsMoveing() {
+        return this.isMoveing;
     }
     initCanvas() {
         return __awaiter(this, void 0, void 0, function* () {
             this.bindHandler(this.el, 'start', this.touchstart.bind(this));
             this.bindHandler(this.el, 'move', this.touchmove.bind(this));
             this.bindHandler(this.el, 'end', this.touchend.bind(this));
-            this.el.addEventListener('mousedown', this.touchstart.bind(this));
+            this.bindHandler(this.el, 'end', this.touchend.bind(this));
             const ctx = this.el.getContext('2d');
             yield this.setBackgroundImg(ctx);
             ctx.lineWidth = this.options.lineWidth;
@@ -93,16 +128,12 @@ class FlickerSignature {
             x: pos.x,
             y: pos.y
         });
-        if (getPlatform() === 'Desktop') {
-            this.isMoveing = true;
-        }
+        this.isMoveing = true;
     }
     touchmove(ev) {
-        console.log('touchmove:', getPlatform(), this.isMoveing);
         if (getPlatform() === 'Desktop' && !this.isMoveing)
             return;
         const pos = this.getPos(ev);
-        console.log("pos:", pos);
         if (this.points.length === 3) {
             const [startPos, middlePos, endPos] = this.points;
             this.ctx.beginPath();
@@ -131,9 +162,7 @@ class FlickerSignature {
         }
         this.drawRecords.push(this.ctx.getImageData(0, 0, this.el.clientWidth, this.el.clientHeight));
         this.trackIndex = this.drawRecords.length - 1;
-        if (getPlatform() === 'Desktop') {
-            this.isMoveing = false;
-        }
+        this.isMoveing = false;
     }
     /** 撤销绘画 */
     cancelStrokes(count = 1) {
@@ -152,14 +181,22 @@ class FlickerSignature {
             this.ctx.putImageData(imgData, 0, 0);
         }
     }
+    /**
+     * @description 清除画布上的所有内容
+     */
+    clearCanvas() {
+        this.drawRecords = this.drawRecords.splice(0, 1);
+        this.ctx.putImageData(this.drawRecords[0], 0, 0);
+        this.trackIndex = 0;
+    }
     /**设置背景图片 */
     setBackgroundImg(ctx) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log(this.options);
             if (this.options.backgroundImg === 'grid') {
                 this.drawGrid(ctx, 10, 10, 'lightgray', 0.5);
             }
-            else if (this.options.backgroundImg === 'white') {
-            }
+            else if (this.options.backgroundImg === 'white') ;
             else {
                 const img = new Image(this.el.clientWidth, this.el.clientHeight);
                 img.src = this.options.backgroundImg;
@@ -221,4 +258,5 @@ class FlickerSignature {
         return pos;
     }
 }
-export default FlickerSignature;
+
+export { FlickerSignature as default };

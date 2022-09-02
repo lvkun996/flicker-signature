@@ -1,5 +1,11 @@
 # flicker-signature
-更好用的电子签名库，适配桌面端与移动端
+更好用的电子签名库，适配桌面端与移动端,
+
+## 功能
+1. 适配桌面端与移动端
+2. 支持撤销笔画和恢复笔画
+3. 支持倒出base64与blob文件
+4. 采用二次贝塞尔曲线优化线条平滑性
 
 ## 下载
 
@@ -39,9 +45,11 @@ npm i flicker-signature
         methods: {
             initCanvas () {
                 this.fs = new FlickerSignature(
-                	document.getElementById('myCanvas'),
            			{
-                    	backgroundImg: 'grid'
+                        el: document.getElementById('myCanvas'),
+                        options: {
+                            backgroundImg: 'grid'
+                        }
                   	}
                 )
             },
@@ -56,7 +64,7 @@ npm i flicker-signature
 ### react
 
 ```react
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, {  useLayoutEffect, useRef } from 'react';
 import FlickerSignature from 'flicker-signature'
 
 const App = () => {
@@ -65,9 +73,11 @@ const App = () => {
   	
    useLayoutEffect(() => {
     new FlickerSignature(
-      canvasRef.current!,
       {
-        backgroundImg: 'grid'
+        el: canvasRef.current!,
+        options: {
+            backgroundImg: 'grid'
+        }
       }
     )
   }, [])
@@ -102,10 +112,13 @@ flicker-signature的第一个参数是你的canvas节点
 | -------------- | -------------- | -------------- | ------------------------------------------------------------ | ------------------ | ------ |
 | cancelStrokes  | 撤销绘制       | 一次撤销的步数 | string \|number                                              | string \| number   | 1      |
 | recoverStrokes | 恢复绘制       | 一次恢复的步数 | string \| number                                             | string \| number   | 1      |
+| clearCanvas    | 清空画布       |                |                                                              |                    |        |
 | toBase64       | 导出base64     | type           | base64头部，不传默认是image/png                              | string \|undefined | 无     |
 |                |                | quality        | 质量0-1                                                      | number             | 1      |
 | toBlob         | 导出blob流数据 | type           | [`DOMString`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String) 类型，指定图片格式，默认格式（未指定或不支持）为 `image/png`。 | DomString          | 无     |
 |                |                | quality        | 质量0-1                                                      | number             | 1      |
+
+
 
 ## 最后
 

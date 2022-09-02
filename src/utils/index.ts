@@ -20,8 +20,11 @@ export function getPlatform () {
 }
 
 /**
+ * 
  * @description 获取不同平台对应的事件
+ * 
  */
+
 export function getHandlerKey () {
   const platform = getPlatform()
   if (platform === 'Mobile') {
@@ -38,4 +41,15 @@ export function getHandlerKey () {
     }
   }
 }
+
+/**
+ * 
+ * @description canvas 转换为 svg
+ * 
+ */
+
+export function canvasToSvg () {
+  
+}
+
 

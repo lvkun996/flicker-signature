@@ -1,18 +1,20 @@
 import { getHandlerKey, getPlatform } from './utils/index'
 
-class FlickerSignature {
+class FlickerSignature implements FS.IFlickerSignature {
 
   private el: HTMLCanvasElement
 
   private options: FS.Options = {
+
     lineWidth: 3,
     lineColor: '#000',
-    backgroundImg: 'board'
+    backgroundImg: 'grid'
+
   }
 
-  protected ctx!: CanvasRenderingContext2D
+  private ctx!: CanvasRenderingContext2D
 
-  private points: {x: number, y: number}[] = [] 
+  private points: {x: number, y: number}[] = []
 
   /** 绘图记录 */
   private drawRecords: ImageData[] = []
@@ -29,12 +31,20 @@ class FlickerSignature {
   /** 是否正在绘制中 */
   private isMoveing: boolean = false
 
-  constructor (el: HTMLCanvasElement, options: FS.Options) {
+  constructor ({
+    el,
+    options
+  }: {
+    el?: HTMLCanvasElement, 
+    options?: FS.Options
+  }) {
 
     if ( !el ) {
-
       throw new Error("canvas node cannot be empty");
-    
+    }
+
+    if ( !options ) {
+      console.warn("Flicker-signture: options not configured");
     }
 
     this.el = el
@@ -51,18 +61,23 @@ class FlickerSignature {
 
   }
 
+  /**暴露给用户 */
+  get IsMoveing () {
+    return this.isMoveing
+  }
+
   async initCanvas (): Promise<CanvasRenderingContext2D> {
     
     this.bindHandler(this.el, 'start', this.touchstart.bind(this))
     this.bindHandler(this.el, 'move', this.touchmove.bind(this))
+    this.bindHandler(this.el, 'end', this.touchend.bind(this))
+  
     this.bindHandler (this.el, 'end', this.touchend.bind(this))
 
-   this.el.addEventListener('mousedown', this.touchstart.bind(this))
-
    const ctx = this.el.getContext('2d')!
-
+   
    await this.setBackgroundImg(ctx)
-
+    
    ctx.lineWidth = this.options.lineWidth
    
    ctx.strokeStyle = this.options.lineColor
@@ -83,8 +98,8 @@ class FlickerSignature {
    * @param ev 
    * 
    */
-  protected bindHandler (
-    node: HTMLCanvasElement, 
+  private bindHandler (
+    node: HTMLCanvasElement,
     eventKey: 'start' | 'move' | 'end' , 
     cb
   ) {
@@ -93,7 +108,7 @@ class FlickerSignature {
 
   }
 
-  protected touchstart <T extends TouchEvent | MouseEvent >( ev: T) {
+  private touchstart <T extends TouchEvent | MouseEvent >( ev: T) {
     
     const pos = this.getPos(ev)
 
@@ -104,12 +119,11 @@ class FlickerSignature {
       y: pos.y
     })
 
-    if (getPlatform() === 'Desktop') {
-      this.isMoveing = true
-    }
+    this.isMoveing = true
+
   }
 
-  protected touchmove <T extends TouchEvent | MouseEvent>( ev: T) {
+  private touchmove <T extends TouchEvent | MouseEvent>( ev: T) {
     
     if (getPlatform() === 'Desktop' && !this.isMoveing) return
     
@@ -117,7 +131,7 @@ class FlickerSignature {
 
     if ( this.points.length === 3) {
 
-      const [ startPos, middlePos, endPos ] = this.points
+      const [ startPos, middlePos,  endPos ] = this.points
 
       this.ctx.beginPath()
 
@@ -147,7 +161,7 @@ class FlickerSignature {
     }
   }
 
-  protected touchend ( ev: TouchEvent | MouseEvent) {
+  private touchend ( ev: TouchEvent | MouseEvent) {
 
     this.points = []
 
@@ -162,9 +176,7 @@ class FlickerSignature {
     
     this.trackIndex = this.drawRecords.length - 1
 
-    if (getPlatform() === 'Desktop') {
-      this.isMoveing = false
-    }
+    this.isMoveing = false
 
   }
 
@@ -174,12 +186,15 @@ class FlickerSignature {
     if (this.drawRecords.length && this.trackIndex >= 1) {
 
       const diffCount = this.trackIndex - Number(count)
+
       this.trackIndex = diffCount >= 0 ? diffCount : 0
       
       const imgData = this.drawRecords[this.trackIndex]
       
       this.ctx.putImageData(imgData, 0, 0)
+
     }
+
   }
 
   /**恢复绘画 */
@@ -191,13 +206,23 @@ class FlickerSignature {
     }
   }
 
-  /**清除画布 */
-  clearStrokes () {
-     
+  /**
+   * @description 清除画布上的所有内容
+   */
+  clearCanvas () {
+
+    this.drawRecords = this.drawRecords.splice(0, 1)
+
+    this.ctx.putImageData(this.drawRecords[0], 0, 0)
+    
+    this.trackIndex = 0
+
   }
 
   /**设置背景图片 */
-  async setBackgroundImg (ctx: CanvasRenderingContext2D) {
+  private async setBackgroundImg (ctx: CanvasRenderingContext2D) {
+    console.log(this.options);
+    
     if (this.options.backgroundImg === 'grid' ) {
     
       this.drawGrid(ctx, 10, 10, 'lightgray', 0.5)
@@ -233,7 +258,7 @@ class FlickerSignature {
     })
   }
 
-  drawGrid (ctx, stepX, stepY, color, lineWidth) {
+  private drawGrid (ctx, stepX, stepY, color, lineWidth) {
     ctx.beginPath()
     // 创建垂直格网线路径
     for(let i = 0.5 + stepX; i < this.el.clientWidth; i += stepX){
@@ -255,8 +280,8 @@ class FlickerSignature {
     // 清除路径
     ctx.closePath();
   }
-
-  getPos (ev: TouchEvent | MouseEvent) {
+  
+  private getPos (ev: TouchEvent | MouseEvent) {
     let pos: { x: number, y: number } = Object.create(null)
 
     if ( getPlatform() === 'Mobile') {
@@ -273,8 +298,6 @@ class FlickerSignature {
 
     return pos
   }
-
-  // drawGrid(10, 10, 'lightgray', 0.5);
 
 }
 
